@@ -184,25 +184,15 @@ public:
 class Enemies {
 private:
     Texture enemy_texture;
-    Sprite enemy_sprite;
-    float speed;
+    Sprite *enemy_sprite;
 public:
-    Enemies () : enemy_sprite (enemy_texture) {
+    Enemies () {
         enemy_texture.loadFromFile("coding\\assets\\meteor.png");
-        enemy_sprite.setTexture(enemy_texture);
-        speed = 2.0f;
+        enemy_sprite = new Sprite(enemy_texture);
     }
 
-    void move() {
-        enemy_sprite.move({-speed,0});
-    }
-
-    void set_speed(float s) {
-        speed = s;
-    }
-
-    void set_position(float x, float y) {
-        enemy_sprite.setPosition(Vector2f(x,y));
+    void draw(RenderWindow &window) {
+        window.draw(*enemy_sprite);
     }
 };
 
@@ -217,6 +207,7 @@ int main(){
     Background background;
     GamePanel gamepanel;
     Tracks myzika;
+    Enemies meteorit;
     
     myzika.play1();
 
@@ -240,6 +231,7 @@ int main(){
         background.draw(window);
         gamepanel.draw(window);
         player.draw(window);
+        meteorit.draw(window);
         window.display();
     }
 }
