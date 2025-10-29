@@ -180,7 +180,32 @@ public:
         }
     }
 };
-  
+
+class Enemies {
+private:
+    Texture enemy_texture;
+    Sprite enemy_sprite;
+    float speed;
+public:
+    Enemies () : enemy_sprite (enemy_texture) {
+        enemy_texture.loadFromFile("coding\\assets\\meteor.png");
+        enemy_sprite.setTexture(enemy_texture);
+        speed = 2.0f;
+    }
+
+    void move() {
+        enemy_sprite.move({-speed,0});
+    }
+
+    void set_speed(float s) {
+        speed = s;
+    }
+
+    void set_position(float x, float y) {
+        enemy_sprite.setPosition(Vector2f(x,y));
+    }
+};
+
 int main(){
 
     // Отрисовка окна и иконки
