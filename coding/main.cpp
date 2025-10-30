@@ -185,10 +185,17 @@ class Enemies {
 private:
     Texture enemy_texture;
     Sprite *enemy_sprite;
+    float speed = 300;
 public:
     Enemies () {
         enemy_texture.loadFromFile("coding\\assets\\meteor.png");
         enemy_sprite = new Sprite(enemy_texture);
+        enemy_sprite->setPosition({1920,650});
+        enemy_sprite->setScale({0.15f,0.15f});
+    }
+
+    void move(float deltatime) {
+        enemy_sprite->move({-speed * deltatime, 0});
     }
 
     void draw(RenderWindow &window) {
@@ -226,6 +233,7 @@ int main(){
         myzika.check_press();
         player.move(deltatime);
         background.background_move(deltatime);
+        meteorit.move(deltatime);
        
         window.clear(Color::Black);
         background.draw(window);
