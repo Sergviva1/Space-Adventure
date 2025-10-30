@@ -41,6 +41,10 @@ public:
         sprite.setPosition({150.f, 50.f});
     }
 
+    FloatRect getGlobalBounds() {
+        return sprite.getGlobalBounds();
+    }
+
     void move(float deltatime){
         if (Keyboard::isKeyPressed(Keyboard::Key::A)) {
         sprite.move({-speed * deltatime, 0.f});
@@ -199,6 +203,10 @@ public:
         return enemy_sprite->getPosition();
     }
 
+    FloatRect getGlobalBounds() {
+        return enemy_sprite->getGlobalBounds();
+    }
+
     void move(float deltatime) {
         enemy_sprite->move({-speed * deltatime, 0});
         if (get_position().x < -200 ) {
@@ -243,7 +251,11 @@ int main(){
         player.move(deltatime);
         background.background_move(deltatime);
         meteorit.move(deltatime);
-       
+
+        if (player.getGlobalBounds().findIntersection(meteorit.getGlobalBounds())) {
+            window.close();
+        }
+        
         window.clear(Color::Black);
         background.draw(window);
         gamepanel.draw(window);
