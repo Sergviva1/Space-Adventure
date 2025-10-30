@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
+#include <time.h>
 using namespace std;
 using namespace sf;
 
@@ -190,7 +191,7 @@ public:
     Enemies () {
         enemy_texture.loadFromFile("coding\\assets\\meteor.png");
         enemy_sprite = new Sprite(enemy_texture);
-        enemy_sprite->setPosition({1980,650});
+        enemy_sprite->setPosition({1980,197 + rand() % 875});
         enemy_sprite->setScale({0.15f,0.15f});
     }
 
@@ -201,7 +202,7 @@ public:
     void move(float deltatime) {
         enemy_sprite->move({-speed * deltatime, 0});
         if (get_position().x < -200 ) {
-            enemy_sprite->setPosition({1980,650});
+            enemy_sprite->setPosition({1980,197 + rand() % 875});
         }
     }
 
@@ -227,6 +228,7 @@ int main(){
 
     Clock clock;
     float deltatime;
+    srand(time(NULL));
 
     // Основной цикл
     while (window.isOpen()){
