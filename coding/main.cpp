@@ -190,12 +190,19 @@ public:
     Enemies () {
         enemy_texture.loadFromFile("coding\\assets\\meteor.png");
         enemy_sprite = new Sprite(enemy_texture);
-        enemy_sprite->setPosition({1920,650});
+        enemy_sprite->setPosition({1980,650});
         enemy_sprite->setScale({0.15f,0.15f});
+    }
+
+    Vector2f get_position() {
+        return enemy_sprite->getPosition();
     }
 
     void move(float deltatime) {
         enemy_sprite->move({-speed * deltatime, 0});
+        if (get_position().x < -200 ) {
+            enemy_sprite->setPosition({1980,650});
+        }
     }
 
     void draw(RenderWindow &window) {
