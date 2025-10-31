@@ -229,11 +229,15 @@ public:
         return enemy_sprite->getGlobalBounds();
     }
 
-    void move(float deltatime) {
-        enemy_sprite->move({-speed * deltatime, 0});
+    void respawn() {
         if (get_position().x < -200 ) {
             enemy_sprite->setPosition({1980,197 + rand() % 875});
         }
+    }
+
+    void move(float deltatime) {
+        enemy_sprite->move({-speed * deltatime, 0});
+        respawn();
     }
 
     void draw(RenderWindow &window) {
@@ -277,9 +281,7 @@ int main(){
         if (player.getGlobalBounds().findIntersection(meteorit.getGlobalBounds())) {
             player.damage();
             player.respawn();
-            if (meteorit.get_position().x < -200) {
-                player.reset_can_be_hit();
-            }
+            player.reset_can_be_hit();
             cout << "Health = " << player.get_health() << endl;
         }
         
