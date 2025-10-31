@@ -5,17 +5,20 @@
 #include <time.h>
 using namespace std;
 using namespace sf;
+#include <iostream>
 
 class Player{
 private:
     Texture texture;
     Sprite sprite;
+    int health = 3;
+    bool can_be_hit = true;
+    float speed = 1000.f;
     int current_frame = 0;
     float frametime = 0.f;
     float switch_time = 0.2f;
     int frame_width = 166;
     int frame_height = 130;
-    float speed = 1000.f;
 
     void player_lock(){
         Vector2f posplayer = sprite.getPosition();
@@ -43,6 +46,21 @@ public:
 
     FloatRect getGlobalBounds() {
         return sprite.getGlobalBounds();
+    }
+
+    int get_health() {
+        return health;
+    }
+
+    void damage() {
+        if (can_be_hit == true) {
+            health = health - 1;
+            can_be_hit = false;
+        }
+    }
+
+    void reset_can_be_hit() {
+        can_be_hit = true;
     }
 
     void move(float deltatime){
@@ -73,6 +91,10 @@ public:
             int y0ffset = current_frame * frame_height;
             sprite.setTextureRect(IntRect({0, y0ffset}, {frame_width, frame_height}));
         } 
+    }
+
+    void respawn() {
+        sprite.setPosition({150.f, 50.f});
     }
 
     void draw(RenderWindow &window){
@@ -253,7 +275,12 @@ int main(){
         meteorit.move(deltatime);
 
         if (player.getGlobalBounds().findIntersection(meteorit.getGlobalBounds())) {
-            window.close();
+            player.damage();
+            player.respawn();
+            if (meteorit.get_position().x < -200) {
+                player.reset_can_be_hit();
+            }
+            cout << "Health = " << player.get_health() << endl;
         }
         
         window.clear(Color::Black);
