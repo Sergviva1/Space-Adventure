@@ -41,7 +41,7 @@ public:
         texture.loadFromFile("coding\\assets\\spritelist.png");
         sprite.setTexture(texture);
         sprite.setTextureRect(IntRect({0,0}, {166, 130}));
-        sprite.setPosition({150.f, 50.f});
+        sprite.setPosition({150.f, 550.f});
     }
 
     FloatRect getGlobalBounds() {
@@ -58,7 +58,11 @@ public:
             can_be_hit = false;
         }
     }
-
+    
+    void respawn() {
+        sprite.setPosition({150.f, 550.f});
+    }
+    
     void reset_can_be_hit() {
         can_be_hit = true;
     }
@@ -93,9 +97,6 @@ public:
         } 
     }
 
-    void respawn() {
-        sprite.setPosition({150.f, 50.f});
-    }
 
     void draw(RenderWindow &window){
         window.draw(sprite);
