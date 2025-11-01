@@ -284,6 +284,9 @@ int main(){
             player.respawn();
             player.reset_can_be_hit();
             cout << "Health = " << player.get_health() << endl;
+            if (player.get_health() == 0) {
+                window.close();
+            }
         }
         
         window.clear(Color::Black);
