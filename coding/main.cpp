@@ -246,6 +246,21 @@ public:
     }
 };
 
+class GameOver {
+private:
+    Texture GameOver_Texture;
+    Sprite *GameOver_Sprite;
+public:
+    GameOver() {
+        GameOver_Texture.loadFromFile("coding\\assets\\gameover.png");
+        GameOver_Sprite = new Sprite (GameOver_Texture);
+    }
+
+    void draw(RenderWindow &window){
+        window.draw(*GameOver_Sprite);
+    }
+};
+
 int main(){
 
     // Отрисовка окна и иконки
@@ -258,6 +273,7 @@ int main(){
     GamePanel gamepanel;
     Tracks myzika;
     Enemies meteorit;
+    GameOver gameover;
     
     myzika.play1();
 
@@ -294,6 +310,7 @@ int main(){
         gamepanel.draw(window);
         player.draw(window);
         meteorit.draw(window);
+        // gameover.draw(window);
         window.display();
     }
 }
