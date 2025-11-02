@@ -244,6 +244,10 @@ public:
     void draw(RenderWindow &window) {
         window.draw(*enemy_sprite);
     }
+
+    ~Enemies() {
+        delete enemy_sprite;
+    }
 };
 
 class GameOver {
@@ -260,6 +264,10 @@ public:
 
     void draw(RenderWindow &window){
         window.draw(*GameOver_Sprite);
+    }
+
+    ~GameOver() {
+        delete GameOver_Sprite;
     }
 };
 
@@ -289,6 +297,10 @@ public:
 
     void draw (RenderWindow &window) {
         window.draw(*Sprite_HealthBar);
+    }
+
+    ~HealthBar() {
+        delete Sprite_HealthBar;
     }
 };
 
