@@ -263,6 +263,22 @@ public:
     }
 };
 
+class HealthBar {
+private:
+    Texture Texture_HealthBar;
+    Sprite *Sprite_HealthBar;
+public:
+    HealthBar() {
+        Texture_HealthBar.loadFromFile("coding\\assets\\healthbar.png");
+        Sprite_HealthBar = new Sprite(Texture_HealthBar);
+        Sprite_HealthBar->setPosition({0,0});
+    }
+
+    void draw (RenderWindow &window) {
+        window.draw(*Sprite_HealthBar);
+    }
+};
+
 int main(){
 
     // Отрисовка окна и иконки
@@ -276,6 +292,7 @@ int main(){
     Tracks myzika;
     Enemies meteorit;
     GameOver gameover;
+    HealthBar healthbar;
     
     myzika.play1();
 
@@ -304,7 +321,7 @@ int main(){
             cout << "Health = " << player.get_health() << endl;
             if (player.get_health() == 0) {
                 gameover.draw(window);
-                window.display();
+                window.display();   
                 sleep(seconds(2));
                 window.close();
             }
@@ -315,6 +332,7 @@ int main(){
         gamepanel.draw(window);
         player.draw(window);
         meteorit.draw(window);
+        healthbar.draw(window);
         window.display();
     }
 }
