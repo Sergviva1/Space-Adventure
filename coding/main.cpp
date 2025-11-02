@@ -272,6 +272,18 @@ public:
         Texture_HealthBar.loadFromFile("coding\\assets\\healthbar.png");
         Sprite_HealthBar = new Sprite(Texture_HealthBar);
         Sprite_HealthBar->setPosition({0,0});
+        update(3);
+
+    }
+
+    void update(int health) {
+        if (health == 3) {
+            Sprite_HealthBar->setTextureRect(IntRect({0, 0}, {312, 104}));
+        } else if (health == 2) {
+            Sprite_HealthBar->setTextureRect(IntRect({0, 104}, {312, 104}));
+        } else if (health == 1) {
+            Sprite_HealthBar->setTextureRect(IntRect({0, 204}, {312, 104}));
+        }
     }
 
     void draw (RenderWindow &window) {
@@ -316,6 +328,7 @@ int main(){
 
         if (player.getGlobalBounds().findIntersection(meteorit.getGlobalBounds())) {
             player.damage();
+            healthbar.update(player.get_health());
             player.respawn();
             player.reset_can_be_hit();
             cout << "Health = " << player.get_health() << endl;
