@@ -254,6 +254,8 @@ public:
     GameOver() {
         GameOver_Texture.loadFromFile("coding\\assets\\gameover.png");
         GameOver_Sprite = new Sprite (GameOver_Texture);
+        GameOver_Sprite->setScale({0.4f,0.4f});
+        GameOver_Sprite->setPosition({650,339});
     }
 
     void draw(RenderWindow &window){
@@ -301,6 +303,9 @@ int main(){
             player.reset_can_be_hit();
             cout << "Health = " << player.get_health() << endl;
             if (player.get_health() == 0) {
+                gameover.draw(window);
+                window.display();
+                sleep(seconds(2));
                 window.close();
             }
         }
@@ -310,7 +315,6 @@ int main(){
         gamepanel.draw(window);
         player.draw(window);
         meteorit.draw(window);
-        // gameover.draw(window);
         window.display();
     }
 }
