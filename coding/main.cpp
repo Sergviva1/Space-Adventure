@@ -272,6 +272,7 @@ public:
         Texture_HealthBar.loadFromFile("coding\\assets\\healthbar.png");
         Sprite_HealthBar = new Sprite(Texture_HealthBar);
         Sprite_HealthBar->setPosition({0,0});
+        Sprite_HealthBar->setScale({0.5f,0.5f});
         update(3);
 
     }
@@ -280,9 +281,9 @@ public:
         if (health == 3) {
             Sprite_HealthBar->setTextureRect(IntRect({0, 0}, {312, 104}));
         } else if (health == 2) {
-            Sprite_HealthBar->setTextureRect(IntRect({0, 104}, {312, 104}));
+            Sprite_HealthBar->setTextureRect(IntRect({0, 107}, {312, 104}));
         } else if (health == 1) {
-            Sprite_HealthBar->setTextureRect(IntRect({0, 204}, {312, 104}));
+            Sprite_HealthBar->setTextureRect(IntRect({0, 207}, {312, 104}));
         }
     }
 
