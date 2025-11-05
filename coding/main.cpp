@@ -2,10 +2,14 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
+#include <random>
 #include <time.h>
 using namespace std;
 using namespace sf;
 #include <iostream>
+random_device rd;
+mt19937 gen(rd());
+uniform_int_distribution<> distrib(197,955);
 
 class Player{
 private:
@@ -251,7 +255,7 @@ public:
     Enemies () {
         enemy_texture.loadFromFile("coding\\assets\\meteor.png");
         enemy_sprite = new Sprite(enemy_texture);
-        enemy_sprite->setPosition({2000,197 + rand() % 758});
+        enemy_sprite->setPosition({2000, static_cast<float>(distrib(gen))});
         enemy_sprite->setScale({0.15f,0.15f});
     }
 
@@ -265,7 +269,7 @@ public:
 
     void respawn() {
         if (get_position().x < -100 ) {
-            enemy_sprite->setPosition({2000,197 + rand() % 758});
+            enemy_sprite->setPosition({2000, static_cast<float>(distrib(gen))});
         }
     }
 
@@ -346,7 +350,7 @@ public:
     Bonus () {
         Texture_bonus.loadFromFile("coding\\assets\\bonus.png");
         Sprite_bonus = new Sprite(Texture_bonus);
-        Sprite_bonus->setPosition({2000,197 + rand() % 758});
+        Sprite_bonus->setPosition({2000, static_cast<float>(distrib(gen))});
     }
 
     Vector2f get_position() {
@@ -358,12 +362,12 @@ public:
     }
 
     void instant_respawn () {
-        Sprite_bonus->setPosition({2000,197 + rand() % 758});
+        Sprite_bonus->setPosition({2000, static_cast<float>(distrib(gen))});
     }
 
     void respawn() {
         if (get_position().x < -100 ) {
-            Sprite_bonus->setPosition({2000,197 + rand() % 758});
+            Sprite_bonus->setPosition({2000, static_cast<float>(distrib(gen))});
         }
     }
 
