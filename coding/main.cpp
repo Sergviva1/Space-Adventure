@@ -434,9 +434,10 @@ int main(){
         }
 
         if (player.getGlobalBounds().findIntersection(bonus.getGlobalBounds())) {
+            int old_health = player.get_health();
             player.heal();
             healthbar.update(player.get_health());
-            if (player.get_can_be_hit() == true) {
+            if (player.get_health() > old_health) {
                 bonus.instant_respawn();
             }
             cout << "Health = " << player.get_health() << endl;
