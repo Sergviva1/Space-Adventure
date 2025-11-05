@@ -13,6 +13,8 @@ private:
     Sprite sprite;
     int health = 3;
     bool can_be_hit = true;
+    bool visible = true;
+    float visible_timer = 0.0f;
     float invincibility_timer = 0.0f;
     float speed = 1000.f;
     int current_frame = 0;
@@ -63,9 +65,17 @@ public:
     void invincibility(float deltatime) {
         if (can_be_hit == false) {
             invincibility_timer += deltatime;
+            visible_timer += deltatime;
+
+            if (visible_timer >= 0.2) {
+                visible = !visible;
+                visible_timer = 0.0;
+            }
+
             if (invincibility_timer >= 2.0) {
                 can_be_hit = true;
                 invincibility_timer = 0.0f;
+                visible = true;
             }
         }
     }
@@ -110,7 +120,9 @@ public:
 
 
     void draw(RenderWindow &window){
-        window.draw(sprite);
+        if (visible == true) {
+            window.draw(sprite);
+        }
     }
 
 };
@@ -345,11 +357,11 @@ int main(){
             }  
         }
         
-        myzika.check_press();
         player.move(deltatime);
+        player.invincibility(deltatime);
         background.background_move(deltatime);
         meteorit.move(deltatime);
-        player.invincibility(deltatime);
+        myzika.check_press();
 
         if (player.getGlobalBounds().findIntersection(meteorit.getGlobalBounds())) {
             player.damage();
