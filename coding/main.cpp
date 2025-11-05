@@ -13,6 +13,7 @@ private:
     Sprite sprite;
     int health = 3;
     bool can_be_hit = true;
+    float invincibility_timer = 0.0f;
     float speed = 1000.f;
     int current_frame = 0;
     float frametime = 0.f;
@@ -59,6 +60,16 @@ public:
         }
     }
     
+    void invincibility(float deltatime) {
+        if (can_be_hit == false) {
+            invincibility_timer += deltatime;
+            if (invincibility_timer >= 2.0) {
+                can_be_hit = true;
+                invincibility_timer = 0.0f;
+            }
+        }
+    }
+
     void respawn() {
         sprite.setPosition({150.f, 550.f});
     }
@@ -338,12 +349,13 @@ int main(){
         player.move(deltatime);
         background.background_move(deltatime);
         meteorit.move(deltatime);
+        player.invincibility(deltatime);
 
         if (player.getGlobalBounds().findIntersection(meteorit.getGlobalBounds())) {
             player.damage();
             healthbar.update(player.get_health());
             player.respawn();
-            player.reset_can_be_hit();
+            // player.reset_can_be_hit();
             cout << "Health = " << player.get_health() << endl;
             if (player.get_health() == 0) {
                 gameover.draw(window);
