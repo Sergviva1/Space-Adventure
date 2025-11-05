@@ -381,6 +381,22 @@ public:
     }
 };
 
+class ScoreDisplay {
+private:
+    Font font;
+    Text *score;
+    int score_value = 0;
+public:
+    ScoreDisplay() {
+        font.openFromFile("C:/Windows/Fonts/Arial.ttf");
+        score = new Text(font, "Hello", 100);
+    }
+
+    void draw(RenderWindow &window) {
+        window.draw(*score);
+    }
+};
+
 int main(){
 
     // Отрисовка окна и иконки
@@ -396,6 +412,7 @@ int main(){
     GameOver gameover;
     HealthBar healthbar;
     Bonus bonus;
+    // ScoreDisplay score;
     
     myzika.play1();
 
@@ -454,6 +471,7 @@ int main(){
         meteorit.draw(window);
         healthbar.draw(window);
         bonus.draw(window);
+        // score.draw(window);
         window.display();
     }
 }
