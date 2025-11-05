@@ -55,6 +55,10 @@ public:
         return health;
     }
 
+    bool get_can_be_hit() {
+        return can_be_hit;
+    }
+
     void damage() {
         if (can_be_hit == true) {
             health = health - 1;
@@ -63,7 +67,7 @@ public:
     }
 
     void heal() {
-        if (health < 3) {
+        if (can_be_hit == true && health < 3) {
             health = health + 1;
         }
     }
@@ -373,7 +377,6 @@ public:
     }
 };
 
-
 int main(){
 
     // Отрисовка окна и иконки
@@ -433,7 +436,9 @@ int main(){
         if (player.getGlobalBounds().findIntersection(bonus.getGlobalBounds())) {
             player.heal();
             healthbar.update(player.get_health());
-            bonus.instant_respawn();
+            if (player.get_can_be_hit() == true) {
+                bonus.instant_respawn();
+            }
             cout << "Health = " << player.get_health() << endl;
         }
         
