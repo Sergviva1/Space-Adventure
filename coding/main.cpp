@@ -25,14 +25,14 @@ private:
 
     void player_lock(){
         Vector2f posplayer = sprite.getPosition();
-        if (posplayer.x > 1770) {
-            sprite.setPosition({1770, posplayer.y});
+        if (posplayer.x > 1780) {
+            sprite.setPosition({1780, posplayer.y});
         }
-        if (posplayer.x < -20) {
-            sprite.setPosition({-20, posplayer.y});
+        if (posplayer.x < -25) {
+            sprite.setPosition({-25, posplayer.y});
         }
-        if (posplayer.y > 875) {
-             sprite.setPosition({posplayer.x, 875});
+        if (posplayer.y > 955) {
+             sprite.setPosition({posplayer.x, 955});
         }
         if (posplayer.y < 197) {
             sprite.setPosition({posplayer.x, 197});
@@ -241,7 +241,7 @@ public:
     Enemies () {
         enemy_texture.loadFromFile("coding\\assets\\meteor.png");
         enemy_sprite = new Sprite(enemy_texture);
-        enemy_sprite->setPosition({1980,197 + rand() % 875});
+        enemy_sprite->setPosition({2000,197 + rand() % 758});
         enemy_sprite->setScale({0.15f,0.15f});
     }
 
@@ -254,8 +254,8 @@ public:
     }
 
     void respawn() {
-        if (get_position().x < -200 ) {
-            enemy_sprite->setPosition({1980,197 + rand() % 875});
+        if (get_position().x < -100 ) {
+            enemy_sprite->setPosition({2000,197 + rand() % 758});
         }
     }
 
@@ -330,7 +330,7 @@ public:
 int main(){
 
     // Отрисовка окна и иконки
-    RenderWindow window(VideoMode::getDesktopMode (), L"Игра");
+    RenderWindow window(VideoMode({1920,1080}), L"Игра", State::Fullscreen);
     Image icon ("coding\\assets\\icon.png");
     window.setIcon(icon);
 
@@ -357,6 +357,10 @@ int main(){
             }  
         }
         
+        if (Keyboard::isKeyPressed(Keyboard::Key::Escape)) {
+            window.close();
+        }
+
         player.move(deltatime);
         player.invincibility(deltatime);
         background.background_move(deltatime);
