@@ -61,6 +61,12 @@ public:
             can_be_hit = false;
         }
     }
+
+    void heal() {
+        if (health < 3) {
+            health = health + 1;
+        }
+    }
     
     void invincibility(float deltatime) {
         if (can_be_hit == false) {
@@ -327,6 +333,47 @@ public:
     }
 };
 
+class Bonus {
+private:
+    Texture Texture_bonus;
+    Sprite *Sprite_bonus;
+    float speed = 300.0f;
+public:
+    Bonus () {
+        Texture_bonus.loadFromFile("coding\\assets\\bonus.png");
+        Sprite_bonus = new Sprite(Texture_bonus);
+        Sprite_bonus->setPosition({2000,197 + rand() % 758});
+    }
+
+    Vector2f get_position() {
+        return Sprite_bonus->getPosition();
+    }
+
+    FloatRect getGlobalBounds() {
+        return Sprite_bonus->getGlobalBounds();
+    }
+
+    void instant_respawn () {
+        Sprite_bonus->setPosition({2000,197 + rand() % 758});
+    }
+
+    void respawn() {
+        if (get_position().x < -100 ) {
+            Sprite_bonus->setPosition({2000,197 + rand() % 758});
+        }
+    }
+
+    void move(float deltatime) {
+        Sprite_bonus->move({-speed * deltatime, 0});
+        respawn();
+    }
+
+    void draw(RenderWindow &window) {
+        window.draw(*Sprite_bonus);
+    }
+};
+
+
 int main(){
 
     // Отрисовка окна и иконки
@@ -341,6 +388,7 @@ int main(){
     Enemies meteorit;
     GameOver gameover;
     HealthBar healthbar;
+    Bonus bonus;
     
     myzika.play1();
 
@@ -365,6 +413,7 @@ int main(){
         player.invincibility(deltatime);
         background.background_move(deltatime);
         meteorit.move(deltatime);
+        bonus.move(deltatime);
         myzika.check_press();
 
         if (player.getGlobalBounds().findIntersection(meteorit.getGlobalBounds())) {
@@ -380,6 +429,13 @@ int main(){
                 window.close();
             }
         }
+
+        if (player.getGlobalBounds().findIntersection(bonus.getGlobalBounds())) {
+            player.heal();
+            healthbar.update(player.get_health());
+            bonus.instant_respawn();
+            cout << "Health = " << player.get_health() << endl;
+        }
         
         window.clear(Color::Black);
         background.draw(window);
@@ -387,6 +443,7 @@ int main(){
         player.draw(window);
         meteorit.draw(window);
         healthbar.draw(window);
+        bonus.draw(window);
         window.display();
     }
 }
