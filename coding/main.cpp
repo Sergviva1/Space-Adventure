@@ -401,6 +401,10 @@ public:
         score->setString(to_string((int)score_value));
     }
 
+    float get_score_value() {
+        return score_value;
+    }
+
     void draw(RenderWindow &window) {
         window.draw(*score);
     }
