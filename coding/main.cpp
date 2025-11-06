@@ -3,6 +3,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
 #include <random>
+#include <string>
 #include <time.h>
 using namespace std;
 using namespace sf;
@@ -385,11 +386,19 @@ class ScoreDisplay {
 private:
     Font font;
     Text *score;
-    int score_value = 0;
+    float score_value = 0.0f;
 public:
     ScoreDisplay() {
         font.openFromFile("C:/Windows/Fonts/Arial.ttf");
-        score = new Text(font, "Hello", 100);
+        score = new Text(font, "0", 100);
+        score->setPosition({3,50});
+        score->setScale({0.7f,0.7f});
+        score->setFillColor(Color::Black);
+    }
+
+    void score_plus(float deltatime){
+        score_value += deltatime;
+        score->setString(to_string((int)score_value));
     }
 
     void draw(RenderWindow &window) {
@@ -412,7 +421,7 @@ int main(){
     GameOver gameover;
     HealthBar healthbar;
     Bonus bonus;
-    // ScoreDisplay score;
+    ScoreDisplay score;
     
     myzika.play1();
 
@@ -439,6 +448,7 @@ int main(){
         meteorit.move(deltatime);
         bonus.move(deltatime);
         myzika.check_press();
+        score.score_plus(deltatime);
 
         if (player.getGlobalBounds().findIntersection(meteorit.getGlobalBounds())) {
             player.damage();
@@ -471,7 +481,7 @@ int main(){
         meteorit.draw(window);
         healthbar.draw(window);
         bonus.draw(window);
-        // score.draw(window);
+        score.draw(window);
         window.display();
     }
 }
