@@ -397,7 +397,7 @@ public:
     }
 
     void score_plus(float deltatime){
-        score_value += deltatime;
+        score_value += deltatime * 30;
         score->setString(to_string((int)score_value));
     }
 
