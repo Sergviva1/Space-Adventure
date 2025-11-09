@@ -12,6 +12,41 @@ random_device rd;
 mt19937 gen(rd());
 uniform_int_distribution<> distrib(197,955);
 
+class GameObjects{
+protected:
+    Texture textureobj;
+    Sprite *spriteobj;
+    float speed;
+public:
+    GameObjects(string img, float spd) : speed(spd){
+        textureobj.loadFromFile(img);
+        spriteobj = new Sprite(textureobj);
+    }
+
+    Vector2f get_position(){
+        return spriteobj->getPosition();
+    }
+
+    FloatRect getGlobalBounds(){
+        return spriteobj->getGlobalBounds();
+    }
+
+    virtual void respawn(){
+    spriteobj->setPosition({2000, static_cast<float>(distrib(gen))});   
+    }
+
+    virtual void move (float deltatime) {
+        spriteobj->move({-speed * deltatime, 0});
+        if (get_position().x < -100) {
+            respawn();
+        }
+    }
+
+    virtual void draw(RenderWindow &window) {
+        window.draw(*spriteobj);
+    }
+};
+
 class Player{
 private:
     Texture texture;
@@ -247,44 +282,10 @@ public:
     }
 };
 
-class Enemies {
-private:
-    Texture enemy_texture;
-    Sprite *enemy_sprite;
-    float speed = 300;
+class Enemies : public GameObjects {
 public:
-    Enemies () {
-        enemy_texture.loadFromFile("coding\\assets\\meteor.png");
-        enemy_sprite = new Sprite(enemy_texture);
-        enemy_sprite->setPosition({2000, static_cast<float>(distrib(gen))});
-        enemy_sprite->setScale({0.15f,0.15f});
-    }
-
-    Vector2f get_position() {
-        return enemy_sprite->getPosition();
-    }
-
-    FloatRect getGlobalBounds() {
-        return enemy_sprite->getGlobalBounds();
-    }
-
-    void respawn() {
-        if (get_position().x < -100 ) {
-            enemy_sprite->setPosition({2000, static_cast<float>(distrib(gen))});
-        }
-    }
-
-    void move(float deltatime) {
-        enemy_sprite->move({-speed * deltatime, 0});
-        respawn();
-    }
-
-    void draw(RenderWindow &window) {
-        window.draw(*enemy_sprite);
-    }
-
-    ~Enemies() {
-        delete enemy_sprite;
+    Enemies() : GameObjects("coding/assets/meteor.png", 300) {
+        spriteobj->setScale({0.15f, 0.15f});
     }
 };
 
@@ -342,43 +343,13 @@ public:
     }
 };
 
-class Bonus {
-private:
-    Texture Texture_bonus;
-    Sprite *Sprite_bonus;
-    float speed = 300.0f;
+class Bonus : public GameObjects{
 public:
-    Bonus () {
-        Texture_bonus.loadFromFile("coding\\assets\\bonus.png");
-        Sprite_bonus = new Sprite(Texture_bonus);
-        Sprite_bonus->setPosition({2000, static_cast<float>(distrib(gen))});
-    }
-
-    Vector2f get_position() {
-        return Sprite_bonus->getPosition();
-    }
-
-    FloatRect getGlobalBounds() {
-        return Sprite_bonus->getGlobalBounds();
+    Bonus() : GameObjects("coding/assets/bonus.png",300){
     }
 
     void instant_respawn () {
-        Sprite_bonus->setPosition({2000, static_cast<float>(distrib(gen))});
-    }
-
-    void respawn() {
-        if (get_position().x < -100 ) {
-            Sprite_bonus->setPosition({2000, static_cast<float>(distrib(gen))});
-        }
-    }
-
-    void move(float deltatime) {
-        Sprite_bonus->move({-speed * deltatime, 0});
-        respawn();
-    }
-
-    void draw(RenderWindow &window) {
-        window.draw(*Sprite_bonus);
+        spriteobj->setPosition({2000, static_cast<float>(distrib(gen))});
     }
 };
 
