@@ -4,10 +4,8 @@
 #include <SFML/Audio.hpp>
 #include <random>
 #include <string>
-#include <time.h>
 using namespace std;
 using namespace sf;
-#include <iostream>
 random_device rd;
 mt19937 gen(rd());
 uniform_int_distribution<> distrib(197,955);
@@ -21,6 +19,7 @@ public:
     GameObjects(string img, float spd) : speed(spd){
         textureobj.loadFromFile(img);
         spriteobj = new Sprite(textureobj);
+        respawn();
     }
 
     Vector2f get_position(){
@@ -44,6 +43,10 @@ public:
 
     virtual void draw(RenderWindow &window) {
         window.draw(*spriteobj);
+    }
+
+    ~GameObjects(){
+        delete spriteobj;
     }
 };
 
@@ -347,10 +350,6 @@ class Bonus : public GameObjects{
 public:
     Bonus() : GameObjects("coding/assets/bonus.png",300){
     }
-
-    void instant_respawn () {
-        spriteobj->setPosition({2000, static_cast<float>(distrib(gen))});
-    }
 };
 
 class ScoreDisplay {
@@ -379,6 +378,10 @@ public:
     void draw(RenderWindow &window) {
         window.draw(*score);
     }
+
+    ~ScoreDisplay(){
+        delete score;
+    }
 };
 
 int main(){
@@ -402,7 +405,6 @@ int main(){
 
     Clock clock;
     float deltatime;
-    srand(time(NULL));
 
     // Основной цикл
     while (window.isOpen()){
@@ -429,8 +431,6 @@ int main(){
             player.damage();
             healthbar.update(player.get_health());
             player.respawn();
-            // player.reset_can_be_hit();
-            cout << "Health = " << player.get_health() << endl;
             if (player.get_health() == 0) {
                 gameover.draw(window);
                 window.display();   
@@ -444,9 +444,8 @@ int main(){
             player.heal();
             healthbar.update(player.get_health());
             if (player.get_health() > old_health) {
-                bonus.instant_respawn();
-            }
-            cout << "Health = " << player.get_health() << endl;
+                bonus.respawn();
+            };
         }
         
         window.clear(Color::Black);
