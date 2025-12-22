@@ -292,6 +292,54 @@ public:
     }
 };
 
+class Menu {
+private:
+    Font font;
+    Text *startText;
+    Text *exitText;
+    bool startSelected;
+    RectangleShape background;
+
+public:
+    Menu() : startSelected(true) {
+        // Простой фон
+        background.setSize(Vector2f(1920, 1080));
+        background.setFillColor(Color(0, 0, 50, 200)); // Темно-синий полупрозрачный
+        
+        // Загрузка шрифта
+        font.openFromFile("C:/Windows/Fonts/Arial.ttf");
+        startText = new Text(font, "0", 100);
+        exitText = new Text(font, "0", 100);
+        // Текст "START"
+        startText->setFont(font);
+        startText->setString(L"Нажмите ENTER для игры");
+        startText->setCharacterSize(100);
+        startText->setFillColor(Color::Green);
+        startText->setPosition({350, 400});
+        
+        // Текст "EXIT"
+        exitText->setFont(font);
+        exitText->setString(L"Нажмите ESC для выхода");
+        exitText->setCharacterSize(60);
+        exitText->setFillColor(Color::White);
+        exitText->setPosition({600, 550});
+    }
+
+    bool update() {
+        // Просто ждем нажатия Enter
+        if (Keyboard::isKeyPressed(Keyboard::Key::Enter)) {
+            return true; // Начать игру
+        }
+        return false; // Продолжить показывать меню
+    }
+
+    void draw(RenderWindow &window) {
+        window.draw(background);
+        window.draw(*startText);
+        window.draw(*exitText);
+    }
+};
+
 class GameOver {
 private:
     Texture GameOver_Texture;
@@ -385,12 +433,47 @@ public:
 };
 
 int main(){
-
     // Отрисовка окна и иконки
     RenderWindow window(VideoMode({1920,1080}), L"Игра", State::Fullscreen);
     Image icon ("coding\\assets\\icon.png");
     window.setIcon(icon);
 
+    // Создание меню
+    Menu menu;
+    bool inMenu = true;
+    bool gameStarted = false;
+
+    // Основной цикл меню
+    while (inMenu && window.isOpen()) {
+        while (const optional event = window.pollEvent()) {
+            if (event->is<Event::Closed>()) {
+                window.close();
+                return 0;
+            }
+        }
+        
+        // Проверка нажатий в меню
+        if (Keyboard::isKeyPressed(Keyboard::Key::Enter)) {
+            inMenu = false;
+            gameStarted = true;
+        }
+        if (Keyboard::isKeyPressed(Keyboard::Key::Escape)) {
+            window.close();
+            return 0;
+        }
+
+        // Отрисовка меню
+        window.clear(Color::Black);
+        menu.draw(window);
+        window.display();
+    }
+
+    // Если игра не была запущена (например, закрыли окно в меню)
+    if (!gameStarted) {
+        return 0;
+    }
+
+    // Инициализация игровых объектов
     Player player;
     Background background;
     GamePanel gamepanel;
@@ -408,7 +491,7 @@ int main(){
 
     // Основной цикл
     while (window.isOpen()){
-        deltatime = clock.restart().asSeconds();
+        deltatime = clock.restart().asSeconds();    
         while (const optional event = window.pollEvent()){
             if (event->is<Event::Closed>()){
                 window.close();
@@ -458,4 +541,6 @@ int main(){
         score.draw(window);
         window.display();
     }
+    
+    return 0;
 }
