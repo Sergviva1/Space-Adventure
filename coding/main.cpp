@@ -275,16 +275,26 @@ class Tracks {
 
     SoundBuffer damagebuffer;
     Sound damagesound;
+    SoundBuffer coinbuffer;
+    Sound coinsound;
+    SoundBuffer healbuffer;
+    Sound healsound;
 public:
-    Tracks() : current_track(1), damagesound(damagebuffer) {
+    Tracks() : current_track(1), damagesound(damagebuffer), coinsound(coinbuffer), healsound(healbuffer) {
         music1.openFromFile("coding\\assets\\The-way-life-goes.ogg");
         music2.openFromFile("coding\\assets\\music.ogg");
         music3.openFromFile("coding\\assets\\yeat.ogg");
 
         damagebuffer.loadFromFile("coding\\assets\\damagesound.wav");
         damagesound.setBuffer(damagebuffer);
+        coinbuffer.loadFromFile("coding\\assets\\coinsound.wav");
+        coinsound.setBuffer(coinbuffer);
+        healbuffer.loadFromFile("coding\\assets\\healsound.wav");
+        healsound.setBuffer(healbuffer);
 
         damagesound.setVolume(5);
+        coinsound.setVolume(5);
+        healsound.setVolume(5);
         music1.setVolume(10);
         music2.setVolume(10);
         music3.setVolume(10);
@@ -331,6 +341,14 @@ public:
 
     void playDamageSound(){
         damagesound.play();
+    }
+
+    void playCoinSound(){
+        coinsound.play();
+    }
+
+    void playHealSound(){
+        healsound.play();
     }
 };
 
@@ -565,12 +583,14 @@ int main(){
             player.heal();
             healthbar.update(player.get_health());
             if (player.get_health() > old_health) {
+                myzika.playHealSound();
                 bonus.respawn();
             };
         }
 
         if (player.getGlobalBounds().findIntersection(coin.getGlobalBounds())) {
             score.score_plus();
+            myzika.playCoinSound();
             coin.respawn();
         }
         
