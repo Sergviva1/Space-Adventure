@@ -208,7 +208,7 @@ class Background {
         backgroundgame2.setPosition(Vector2f {1920,0});
     }
     
-    void background_move(float deltatime){
+    void move(float deltatime){
         backgroundgame.move({-backgroundspeed * deltatime,0});
         pos = backgroundgame.getPosition();
         if (pos.x<-1920) backgroundgame.setPosition({1920,pos.y});
@@ -265,12 +265,17 @@ class HUD {
     private:
     Background background;
     GamePanel gamepanel;
-    GameOver gameover;   
+    GameOver gameover;
+    HealthBar healthbar;   
 public:
-    HUD() : background(), gamepanel(), gameover() {}
+    HUD() : background(), gamepanel(), gameover(), healthbar() {}
 
-    void update(float deltatime) {
-        background.background_move(deltatime);
+    void update_background(float deltatime) {
+        background.move(deltatime);
+    }
+
+    void update_healthbar(int health) {
+        healthbar.update(health);
     }
 
     void draw_gameover(RenderWindow &window){
@@ -280,6 +285,7 @@ public:
     void draw(RenderWindow &window){
         background.draw(window);
         gamepanel.draw(window);
+        healthbar.draw(window);
     }
 };
 
@@ -537,7 +543,6 @@ int main(){
     HUD hud;
     Sounds sounds;
     Enemies meteorit;
-    HealthBar healthbar;
     Bonus bonus;
     ScoreDisplay score;
     Coin coin;
@@ -562,7 +567,7 @@ int main(){
 
         player.move(deltatime);
         player.invincibility(deltatime);
-        hud.update(deltatime);
+        hud.update_background(deltatime);
         meteorit.move(deltatime);
         bonus.move(deltatime);
         coin.move(deltatime);
@@ -571,7 +576,7 @@ int main(){
         if (player.getGlobalBounds().findIntersection(meteorit.getGlobalBounds())) {
             player.damage();
             sounds.playDamageSound();
-            healthbar.update(player.get_health());
+            hud.update_healthbar(player.get_health());
             player.respawn();
             if (player.get_health() == 0) {
                 hud.draw_gameover(window);
@@ -585,7 +590,7 @@ int main(){
         if (player.getGlobalBounds().findIntersection(bonus.getGlobalBounds())) {
             int old_health = player.get_health();
             player.heal();
-            healthbar.update(player.get_health());
+            hud.update_healthbar(player.get_health());
             if (player.get_health() > old_health) {
                 sounds.playHealSound();
                 bonus.respawn();
@@ -602,7 +607,6 @@ int main(){
         hud.draw(window);
         player.draw(window);
         meteorit.draw(window);
-        healthbar.draw(window);
         bonus.draw(window);
         coin.draw(window);
         score.draw(window);
@@ -612,32 +616,3 @@ int main(){
     return 0;
 }
 
-
-
-
-
-// class Player {
-// private:
-//     // ... существующие поля ...
-//     std::vector<Coin*> collectedCoins;  // Агрегация!
-//     int coinsCount = 0;
-    
-// public:
-//     // ... существующие методы ...
-    
-//     // Новый метод для сбора монет
-//     void collectCoin(Coin* coin) {
-//         collectedCoins.push_back(coin);
-//         coinsCount++;
-//         // Можно добавить эффекты: увеличение скорости, здоровья и т.д.
-//         speed += 10.f;  // Пример: каждая монета увеличивает скорость
-//     }
-    
-//     int getCoinsCount() const {
-//         return coinsCount;
-//     }
-    
-//     const std::vector<Coin*>& getCollectedCoins() const {
-//         return collectedCoins;
-//     }
-// };
