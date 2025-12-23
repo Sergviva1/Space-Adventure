@@ -261,14 +261,76 @@ public:
     }
 };
 
+class HealthBar {
+private:
+    Texture Texture_HealthBar;
+    Sprite *Sprite_HealthBar;
+public:
+    HealthBar() {
+        Texture_HealthBar.loadFromFile("coding\\assets\\healthbar.png");
+        Sprite_HealthBar = new Sprite(Texture_HealthBar);
+        Sprite_HealthBar->setPosition({0,0});
+        Sprite_HealthBar->setScale({0.5f,0.5f});
+        update(3);
+
+    }
+
+    void update(int health) {
+        if (health == 3) {
+            Sprite_HealthBar->setTextureRect(IntRect({0, 0}, {312, 104}));
+        } else if (health == 2) {
+            Sprite_HealthBar->setTextureRect(IntRect({0, 107}, {312, 104}));
+        } else if (health == 1) {
+            Sprite_HealthBar->setTextureRect(IntRect({0, 207}, {312, 104}));
+        }
+    }
+
+    void draw (RenderWindow &window) {
+        window.draw(*Sprite_HealthBar);
+    }
+    
+    ~HealthBar() {
+        delete Sprite_HealthBar;
+    }
+};
+
+class ScoreDisplay {
+private:
+    Font font;
+    Text *score;
+    float score_value = 0.0f;
+public:
+    ScoreDisplay() {
+        font.openFromFile("C:/Windows/Fonts/Arial.ttf");
+        score = new Text(font, "0", 100);
+        score->setPosition({3,50});
+        score->setScale({0.7f,0.7f});
+        score->setFillColor(Color::Black);
+    }
+
+    void score_plus(){
+        score_value += 1;
+        score->setString(to_string((int)score_value));
+    }
+
+    void draw(RenderWindow &window) {
+        window.draw(*score);
+    }
+
+    ~ScoreDisplay(){
+        delete score;
+    }
+};
+
 class HUD {
     private:
     Background background;
     GamePanel gamepanel;
     GameOver gameover;
-    HealthBar healthbar;   
+    HealthBar healthbar;
+    ScoreDisplay score;   
 public:
-    HUD() : background(), gamepanel(), gameover(), healthbar() {}
+    HUD() : background(), gamepanel(), gameover(), healthbar(), score() {}
 
     void update_background(float deltatime) {
         background.move(deltatime);
@@ -276,6 +338,10 @@ public:
 
     void update_healthbar(int health) {
         healthbar.update(health);
+    }
+
+    void update_scoredisplay(){
+        score.score_plus();
     }
 
     void draw_gameover(RenderWindow &window){
@@ -286,6 +352,7 @@ public:
         background.draw(window);
         gamepanel.draw(window);
         healthbar.draw(window);
+        score.draw(window);
     }
 };
 
@@ -432,71 +499,6 @@ public:
     }
 };
 
-class HealthBar {
-private:
-    Texture Texture_HealthBar;
-    Sprite *Sprite_HealthBar;
-public:
-    HealthBar() {
-        Texture_HealthBar.loadFromFile("coding\\assets\\healthbar.png");
-        Sprite_HealthBar = new Sprite(Texture_HealthBar);
-        Sprite_HealthBar->setPosition({0,0});
-        Sprite_HealthBar->setScale({0.5f,0.5f});
-        update(3);
-
-    }
-
-    void update(int health) {
-        if (health == 3) {
-            Sprite_HealthBar->setTextureRect(IntRect({0, 0}, {312, 104}));
-        } else if (health == 2) {
-            Sprite_HealthBar->setTextureRect(IntRect({0, 107}, {312, 104}));
-        } else if (health == 1) {
-            Sprite_HealthBar->setTextureRect(IntRect({0, 207}, {312, 104}));
-        }
-    }
-
-    void draw (RenderWindow &window) {
-        window.draw(*Sprite_HealthBar);
-    }
-
-    ~HealthBar() {
-        delete Sprite_HealthBar;
-    }
-};
-
-class ScoreDisplay {
-private:
-    Font font;
-    Text *score;
-    float score_value = 0.0f;
-public:
-    ScoreDisplay() {
-        font.openFromFile("C:/Windows/Fonts/Arial.ttf");
-        score = new Text(font, "0", 100);
-        score->setPosition({3,50});
-        score->setScale({0.7f,0.7f});
-        score->setFillColor(Color::Black);
-    }
-
-    void score_plus(){
-        score_value += 1;
-        score->setString(to_string((int)score_value));
-    }
-
-    float get_score_value() {
-        return score_value;
-    }
-
-    void draw(RenderWindow &window) {
-        window.draw(*score);
-    }
-
-    ~ScoreDisplay(){
-        delete score;
-    }
-};
-
 int main(){
     // Отрисовка окна и иконки
     RenderWindow window(VideoMode({1920,1080}), L"Игра", State::Fullscreen);
@@ -544,7 +546,6 @@ int main(){
     Sounds sounds;
     Enemies meteorit;
     Bonus bonus;
-    ScoreDisplay score;
     Coin coin;
     
     sounds.play1();
@@ -598,7 +599,7 @@ int main(){
         }
 
         if (player.getGlobalBounds().findIntersection(coin.getGlobalBounds())) {
-            score.score_plus();
+            hud.update_scoredisplay();
             sounds.playCoinSound();
             coin.respawn();
         }
@@ -609,10 +610,8 @@ int main(){
         meteorit.draw(window);
         bonus.draw(window);
         coin.draw(window);
-        score.draw(window);
         window.display();
     }
     
     return 0;
 }
-
