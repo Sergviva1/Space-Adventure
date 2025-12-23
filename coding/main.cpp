@@ -3,7 +3,6 @@
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
 #include <random>
-#include <string>
 using namespace std;
 using namespace sf;
 random_device rd;
@@ -58,10 +57,6 @@ public:
         return health;
     }
 
-    bool get_can_be_hit() {
-        return can_be_hit;
-    }
-
     void damage() {
         if (can_be_hit == true) {
             health = health - 1;
@@ -97,10 +92,6 @@ public:
         sprite.setPosition({150.f, 550.f});
     }
     
-    void reset_can_be_hit() {
-        can_be_hit = true;
-    }
-
     void move(float deltatime){
         if (Keyboard::isKeyPressed(Keyboard::Key::A)) {
         sprite.move({-speed * deltatime, 0.f});
@@ -266,7 +257,7 @@ public:
     }
 };
 
-class Tracks {
+class Sounds {
     private:
     Music music1;
     Music music2;
@@ -279,8 +270,10 @@ class Tracks {
     Sound coinsound;
     SoundBuffer healbuffer;
     Sound healsound;
+    SoundBuffer gameoverbuffer;
+    Sound gameoversound;
 public:
-    Tracks() : current_track(1), damagesound(damagebuffer), coinsound(coinbuffer), healsound(healbuffer) {
+    Sounds() : current_track(1), damagesound(damagebuffer), coinsound(coinbuffer), healsound(healbuffer), gameoversound(gameoverbuffer) {
         music1.openFromFile("coding\\assets\\The-way-life-goes.ogg");
         music2.openFromFile("coding\\assets\\music.ogg");
         music3.openFromFile("coding\\assets\\yeat.ogg");
@@ -291,10 +284,13 @@ public:
         coinsound.setBuffer(coinbuffer);
         healbuffer.loadFromFile("coding\\assets\\healsound.wav");
         healsound.setBuffer(healbuffer);
+        gameoverbuffer.loadFromFile("coding\\assets\\gameoversound.wav");
+        gameoversound.setBuffer(gameoverbuffer);
 
         damagesound.setVolume(5);
-        coinsound.setVolume(5);
+        coinsound.setVolume(10);
         healsound.setVolume(5);
+        gameoversound.setVolume(5);
         music1.setVolume(10);
         music2.setVolume(10);
         music3.setVolume(10);
@@ -349,6 +345,10 @@ public:
 
     void playHealSound(){
         healsound.play();
+    }
+
+    void playGameoverSound(){
+        gameoversound.play();
     }
 };
 
@@ -530,7 +530,7 @@ int main(){
     // Инициализация игровых объектов
     Player player;
     HUD hud;
-    Tracks myzika;
+    Sounds sounds;
     Enemies meteorit;
     GameOver gameover;
     HealthBar healthbar;
@@ -538,7 +538,7 @@ int main(){
     ScoreDisplay score;
     Coin coin;
     
-    myzika.play1();
+    sounds.play1();
 
     Clock clock;
     float deltatime;
@@ -562,17 +562,17 @@ int main(){
         meteorit.move(deltatime);
         bonus.move(deltatime);
         coin.move(deltatime);
-        myzika.check_press();
-        // score.score_plus();
+        sounds.check_press();
 
         if (player.getGlobalBounds().findIntersection(meteorit.getGlobalBounds())) {
             player.damage();
-            myzika.playDamageSound();
+            sounds.playDamageSound();
             healthbar.update(player.get_health());
             player.respawn();
             if (player.get_health() == 0) {
                 gameover.draw(window);
-                window.display();   
+                window.display();
+                sounds.playGameoverSound();   
                 sleep(seconds(2));
                 window.close();
             }
@@ -583,14 +583,14 @@ int main(){
             player.heal();
             healthbar.update(player.get_health());
             if (player.get_health() > old_health) {
-                myzika.playHealSound();
+                sounds.playHealSound();
                 bonus.respawn();
             };
         }
 
         if (player.getGlobalBounds().findIntersection(coin.getGlobalBounds())) {
             score.score_plus();
-            myzika.playCoinSound();
+            sounds.playCoinSound();
             coin.respawn();
         }
         
