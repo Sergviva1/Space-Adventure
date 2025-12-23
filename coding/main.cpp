@@ -240,15 +240,41 @@ class GamePanel {
     }
 };
 
-class HUD {
+class GameOver {
 private:
-    Background background;
-    GamePanel gamepanel;   
+    Texture GameOver_Texture;
+    Sprite *GameOver_Sprite;
 public:
-    HUD() : background(), gamepanel() {}
+    GameOver() {
+        GameOver_Texture.loadFromFile("coding\\assets\\gameover.png");
+        GameOver_Sprite = new Sprite (GameOver_Texture);
+        GameOver_Sprite->setScale({0.4f,0.4f});
+        GameOver_Sprite->setPosition({650,339});
+    }
+
+    void draw(RenderWindow &window){
+        window.draw(*GameOver_Sprite);
+    }
+
+    ~GameOver() {
+        delete GameOver_Sprite;
+    }
+};
+
+class HUD {
+    private:
+    Background background;
+    GamePanel gamepanel;
+    GameOver gameover;   
+public:
+    HUD() : background(), gamepanel(), gameover() {}
 
     void update(float deltatime) {
         background.background_move(deltatime);
+    }
+
+    void draw_gameover(RenderWindow &window){
+        gameover.draw(window);
     }
 
     void draw(RenderWindow &window){
@@ -400,27 +426,6 @@ public:
     }
 };
 
-class GameOver {
-private:
-    Texture GameOver_Texture;
-    Sprite *GameOver_Sprite;
-public:
-    GameOver() {
-        GameOver_Texture.loadFromFile("coding\\assets\\gameover.png");
-        GameOver_Sprite = new Sprite (GameOver_Texture);
-        GameOver_Sprite->setScale({0.4f,0.4f});
-        GameOver_Sprite->setPosition({650,339});
-    }
-
-    void draw(RenderWindow &window){
-        window.draw(*GameOver_Sprite);
-    }
-
-    ~GameOver() {
-        delete GameOver_Sprite;
-    }
-};
-
 class HealthBar {
 private:
     Texture Texture_HealthBar;
@@ -532,7 +537,6 @@ int main(){
     HUD hud;
     Sounds sounds;
     Enemies meteorit;
-    GameOver gameover;
     HealthBar healthbar;
     Bonus bonus;
     ScoreDisplay score;
@@ -570,7 +574,7 @@ int main(){
             healthbar.update(player.get_health());
             player.respawn();
             if (player.get_health() == 0) {
-                gameover.draw(window);
+                hud.draw_gameover(window);
                 window.display();
                 sounds.playGameoverSound();   
                 sleep(seconds(2));
@@ -607,3 +611,33 @@ int main(){
     
     return 0;
 }
+
+
+
+
+
+// class Player {
+// private:
+//     // ... существующие поля ...
+//     std::vector<Coin*> collectedCoins;  // Агрегация!
+//     int coinsCount = 0;
+    
+// public:
+//     // ... существующие методы ...
+    
+//     // Новый метод для сбора монет
+//     void collectCoin(Coin* coin) {
+//         collectedCoins.push_back(coin);
+//         coinsCount++;
+//         // Можно добавить эффекты: увеличение скорости, здоровья и т.д.
+//         speed += 10.f;  // Пример: каждая монета увеличивает скорость
+//     }
+    
+//     int getCoinsCount() const {
+//         return coinsCount;
+//     }
+    
+//     const std::vector<Coin*>& getCollectedCoins() const {
+//         return collectedCoins;
+//     }
+// };
