@@ -272,25 +272,34 @@ class Tracks {
     Music music2;
     Music music3;
     int current_track;
+
+    SoundBuffer damagebuffer;
+    Sound damagesound;
 public:
-    Tracks() : current_track(1) {
+    Tracks() : current_track(1), damagesound(damagebuffer) {
         music1.openFromFile("coding\\assets\\The-way-life-goes.ogg");
         music2.openFromFile("coding\\assets\\music.ogg");
         music3.openFromFile("coding\\assets\\yeat.ogg");
+
+        damagebuffer.loadFromFile("coding\\assets\\damagesound.wav");
+        damagesound.setBuffer(damagebuffer);
+
+        damagesound.setVolume(5);
+        music1.setVolume(10);
+        music2.setVolume(10);
+        music3.setVolume(10);
     }
 
     void play1() {
         music2.stop();
-        music3.stop();
-        music1.setVolume(10);
+        music3.stop();  
         music1.play();
         current_track = 1;
     }
 
     void play2() {
         music1.stop();
-        music3.stop();
-        music2.setVolume(10);
+        music3.stop();     
         music2.play();
         current_track = 2;
     }
@@ -298,7 +307,6 @@ public:
     void play3() {
         music1.stop();
         music2.stop();
-        music3.setVolume(10);
         music3.play();
         current_track = 3;
     }
@@ -319,6 +327,10 @@ public:
         if (Keyboard::isKeyPressed(Keyboard::Key::N)) {
         switch_tracks();
         }
+    }
+
+    void playDamageSound(){
+        damagesound.play();
     }
 };
 
@@ -537,6 +549,7 @@ int main(){
 
         if (player.getGlobalBounds().findIntersection(meteorit.getGlobalBounds())) {
             player.damage();
+            myzika.playDamageSound();
             healthbar.update(player.get_health());
             player.respawn();
             if (player.get_health() == 0) {
