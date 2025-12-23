@@ -356,6 +356,134 @@ public:
     }
 };
 
+class Game {
+private:
+    RenderWindow window;
+    Clock clock;
+    float deltatime;
+
+    Player player;
+    HUD hud;
+    Sounds sounds;
+    Enemies meteorit;
+    Bonus bonus;
+    Coin coin;
+    Menu menu;
+
+    bool inMenu;
+    bool gameStarted;
+
+    void ProcessEvents(){
+       while (const optional event = window.pollEvent()){
+            if (event->is<Event::Closed>()){
+                window.close();
+            }  
+        } 
+    }
+
+    void Input() {
+        if (Keyboard::isKeyPressed(Keyboard::Key::Escape)) {
+            window.close();
+        }
+        sounds.check_press();
+    }
+
+    void update() {
+        deltatime = clock.restart().asSeconds();
+        player.move(deltatime);
+        player.invincibility(deltatime);
+        hud.update_background(deltatime);
+        meteorit.move(deltatime);
+        bonus.move(deltatime);
+        coin.move(deltatime);
+        checkCollisions();
+    }
+
+    void checkCollisions(){
+        if (player.getGlobalBounds().findIntersection(meteorit.getGlobalBounds())) {
+            player.damage();
+            sounds.playDamageSound();
+            hud.update_healthbar(player.get_health());
+            player.respawn();
+            if (player.get_health() == 0) {
+                hud.draw_gameover(window);
+                window.display();
+                sounds.playGameoverSound();   
+                sleep(seconds(2));
+                window.close();
+            }
+        }
+
+        if (player.getGlobalBounds().findIntersection(bonus.getGlobalBounds())) {
+            int old_health = player.get_health();
+            player.heal();
+            hud.update_healthbar(player.get_health());
+            if (player.get_health() > old_health) {
+                sounds.playHealSound();
+                bonus.respawn();
+            }
+        }
+
+        if (player.getGlobalBounds().findIntersection(coin.getGlobalBounds())) {
+            hud.update_scoredisplay();
+            sounds.playCoinSound();
+            coin.respawn();
+        }        
+    }
+
+    void render() {
+        window.clear(Color::Black);
+        hud.draw(window);
+        player.draw(window);
+        meteorit.draw(window);
+        bonus.draw(window);
+        coin.draw(window);
+        window.display();
+    }
+
+    void runMenu() {
+        while (inMenu && window.isOpen()) {
+            ProcessEvents();
+                
+            if (Keyboard::isKeyPressed(Keyboard::Key::Enter)) {
+                inMenu = false;
+                startGame();
+                return;
+            }
+            if (Keyboard::isKeyPressed(Keyboard::Key::Escape)) {
+                   window.close();
+                return;
+            }
+
+            window.clear(Color::Black);
+            menu.draw(window);
+            window.display();
+        }
+    }
+
+    void startGame() {
+        sounds.play1();
+        gameStarted = true;
+        
+        while (gameStarted && window.isOpen()) {
+            ProcessEvents();
+            Input();
+            update();
+            render();
+        }
+    }
+
+public:
+    Game(): window(VideoMode({1920, 1080}), L"Игра", State::Fullscreen), deltatime(0), gameStarted(false), inMenu(true) {
+        Image icon ("coding\\assets\\icon.png");
+        window.setIcon(icon);
+    }
+
+    void run(){
+        runMenu();
+    }
+};
+
 class Sounds {
     private:
     Music music1;
@@ -500,118 +628,7 @@ public:
 };
 
 int main(){
-    // Отрисовка окна и иконки
-    RenderWindow window(VideoMode({1920,1080}), L"Игра", State::Fullscreen);
-    Image icon ("coding\\assets\\icon.png");
-    window.setIcon(icon);
-
-    // Создание меню
-    Menu menu;
-    bool inMenu = true;
-    bool gameStarted = false;
-
-    // Основной цикл меню
-    while (inMenu && window.isOpen()) {
-        while (const optional event = window.pollEvent()) {
-            if (event->is<Event::Closed>()) {
-                window.close();
-                return 0;
-            }
-        }
-        
-        // Проверка нажатий в меню
-        if (Keyboard::isKeyPressed(Keyboard::Key::Enter)) {
-            inMenu = false;
-            gameStarted = true;
-        }
-        if (Keyboard::isKeyPressed(Keyboard::Key::Escape)) {
-            window.close();
-            return 0;
-        }
-
-        // Отрисовка меню
-        window.clear(Color::Black);
-        menu.draw(window);
-        window.display();
-    }
-
-    // Если игра не была запущена (например, закрыли окно в меню)
-    if (!gameStarted) {
-        return 0;
-    }
-
-    // Инициализация игровых объектов
-    Player player;
-    HUD hud;
-    Sounds sounds;
-    Enemies meteorit;
-    Bonus bonus;
-    Coin coin;
-    
-    sounds.play1();
-
-    Clock clock;
-    float deltatime;
-
-    // Основной цикл
-    while (window.isOpen()){
-        deltatime = clock.restart().asSeconds();    
-        while (const optional event = window.pollEvent()){
-            if (event->is<Event::Closed>()){
-                window.close();
-            }  
-        }
-        
-        if (Keyboard::isKeyPressed(Keyboard::Key::Escape)) {
-            window.close();
-        }
-
-        player.move(deltatime);
-        player.invincibility(deltatime);
-        hud.update_background(deltatime);
-        meteorit.move(deltatime);
-        bonus.move(deltatime);
-        coin.move(deltatime);
-        sounds.check_press();
-
-        if (player.getGlobalBounds().findIntersection(meteorit.getGlobalBounds())) {
-            player.damage();
-            sounds.playDamageSound();
-            hud.update_healthbar(player.get_health());
-            player.respawn();
-            if (player.get_health() == 0) {
-                hud.draw_gameover(window);
-                window.display();
-                sounds.playGameoverSound();   
-                sleep(seconds(2));
-                window.close();
-            }
-        }
-
-        if (player.getGlobalBounds().findIntersection(bonus.getGlobalBounds())) {
-            int old_health = player.get_health();
-            player.heal();
-            hud.update_healthbar(player.get_health());
-            if (player.get_health() > old_health) {
-                sounds.playHealSound();
-                bonus.respawn();
-            };
-        }
-
-        if (player.getGlobalBounds().findIntersection(coin.getGlobalBounds())) {
-            hud.update_scoredisplay();
-            sounds.playCoinSound();
-            coin.respawn();
-        }
-        
-        window.clear(Color::Black);
-        hud.draw(window);
-        player.draw(window);
-        meteorit.draw(window);
-        bonus.draw(window);
-        coin.draw(window);
-        window.display();
-    }
-    
+    Game game;
+    game.run();
     return 0;
 }
