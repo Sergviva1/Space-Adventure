@@ -10,11 +10,6 @@ random_device rd;
 mt19937 gen(rd());
 uniform_int_distribution<> distrib(197,955);
 
-// TODO:
-
-// 1. Переработать ScoreDisplay
-// 2. Объединить GamePanel и Background
-
 class Player{
 private:
     Texture texture;
@@ -212,7 +207,7 @@ class Background {
     RectangleShape backgroundgame2;
     float backgroundspeed = 100.f;
     Vector2f pos;
-public:
+    public:
     Background(){
         texturespace.loadFromFile("coding\\assets\\space.jpg");
         backgroundgame.setTexture(&texturespace);
@@ -221,7 +216,7 @@ public:
         backgroundgame2.setSize(Vector2f{1920,1080});
         backgroundgame2.setPosition(Vector2f {1920,0});
     }
-
+    
     void background_move(float deltatime){
         backgroundgame.move({-backgroundspeed * deltatime,0});
         pos = backgroundgame.getPosition();
@@ -230,7 +225,7 @@ public:
         pos = backgroundgame2.getPosition();
         if (pos.x<-1920) backgroundgame2.setPosition({1920,pos.y});
     }
-
+    
     void draw(RenderWindow &window) {
         window.draw(backgroundgame2);
         window.draw(backgroundgame);
@@ -238,24 +233,41 @@ public:
 };
 
 class GamePanel {
-private:
+    private:
     Texture gamepaneltexture;
     RectangleShape GamePanelshape;
-public:
+    public:
     GamePanel() {
         gamepaneltexture.loadFromFile("coding\\assets\\gamepanel.png");
         GamePanelshape.setTexture(&gamepaneltexture);
         GamePanelshape.setSize(Vector2f{1920,720});
         GamePanelshape.setPosition(Vector2f{0,0});
     }
-
+    
     void draw(RenderWindow &window){
         window.draw(GamePanelshape);
     }
 };
 
-class Tracks {
+class HUD {
 private:
+    Background background;
+    GamePanel gamepanel;   
+public:
+    HUD() : background(), gamepanel() {}
+
+    void update(float deltatime) {
+        background.background_move(deltatime);
+    }
+
+    void draw(RenderWindow &window){
+        background.draw(window);
+        gamepanel.draw(window);
+    }
+};
+
+class Tracks {
+    private:
     Music music1;
     Music music2;
     Music music3;
@@ -444,7 +456,6 @@ public:
     }
 };
 
-
 int main(){
     // Отрисовка окна и иконки
     RenderWindow window(VideoMode({1920,1080}), L"Игра", State::Fullscreen);
@@ -488,8 +499,7 @@ int main(){
 
     // Инициализация игровых объектов
     Player player;
-    Background background;
-    GamePanel gamepanel;
+    HUD hud;
     Tracks myzika;
     Enemies meteorit;
     GameOver gameover;
@@ -518,7 +528,7 @@ int main(){
 
         player.move(deltatime);
         player.invincibility(deltatime);
-        background.background_move(deltatime);
+        hud.update(deltatime);
         meteorit.move(deltatime);
         bonus.move(deltatime);
         coin.move(deltatime);
@@ -552,8 +562,7 @@ int main(){
         }
         
         window.clear(Color::Black);
-        background.draw(window);
-        gamepanel.draw(window);
+        hud.draw(window);
         player.draw(window);
         meteorit.draw(window);
         healthbar.draw(window);
