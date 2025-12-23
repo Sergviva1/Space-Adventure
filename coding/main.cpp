@@ -10,45 +10,10 @@ random_device rd;
 mt19937 gen(rd());
 uniform_int_distribution<> distrib(197,955);
 
-class GameObjects{
-protected:
-    Texture textureobj;
-    Sprite *spriteobj;
-    float speed;
-public:
-    GameObjects(string img, float spd) : speed(spd){
-        textureobj.loadFromFile(img);
-        spriteobj = new Sprite(textureobj);
-        respawn();
-    }
+// TODO:
 
-    Vector2f get_position(){
-        return spriteobj->getPosition();
-    }
-
-    FloatRect getGlobalBounds(){
-        return spriteobj->getGlobalBounds();
-    }
-
-    virtual void respawn(){
-    spriteobj->setPosition({2000, static_cast<float>(distrib(gen))});   
-    }
-
-    virtual void move (float deltatime) {
-        spriteobj->move({-speed * deltatime, 0});
-        if (get_position().x < -100) {
-            respawn();
-        }
-    }
-
-    virtual void draw(RenderWindow &window) {
-        window.draw(*spriteobj);
-    }
-
-    ~GameObjects(){
-        delete spriteobj;
-    }
-};
+// 1. Переработать ScoreDisplay
+// 2. Объединить GamePanel и Background
 
 class Player{
 private:
@@ -180,8 +145,68 @@ public:
 
 };
 
+class GameObjects{
+    protected:
+    Texture textureobj;
+    Sprite *spriteobj;
+    float speed;
+public:
+    GameObjects(string img, float spd) : speed(spd){
+        textureobj.loadFromFile(img);
+        spriteobj = new Sprite(textureobj);
+        respawn();
+    }
+
+    Vector2f get_position(){
+        return spriteobj->getPosition();
+    }
+
+    FloatRect getGlobalBounds(){
+        return spriteobj->getGlobalBounds();
+    }
+
+    virtual void respawn(){
+    spriteobj->setPosition({2000, static_cast<float>(distrib(gen))});   
+    }
+
+    virtual void move (float deltatime) {
+        spriteobj->move({-speed * deltatime, 0});
+        if (get_position().x < -100) {
+            respawn();
+        }
+    }
+    
+    virtual void draw(RenderWindow &window) {
+        window.draw(*spriteobj);
+    }
+    
+    ~GameObjects(){
+        delete spriteobj;
+    }
+};
+
+class Enemies : public GameObjects {
+public:
+    Enemies() : GameObjects("coding/assets/meteor.png", 300) {
+        spriteobj->setScale({0.15f, 0.15f});
+    }
+};
+
+class Bonus : public GameObjects{
+public:
+    Bonus() : GameObjects("coding/assets/bonus.png",300){
+    }
+};
+
+class Coin : public GameObjects {
+public:
+    Coin() : GameObjects("coding/assets/coin.png",300){
+        spriteobj->setScale({0.45f,0.45f});
+    }
+};
+
 class Background {
-private:
+    private:
     Texture texturespace;
     RectangleShape backgroundgame;
     RectangleShape backgroundgame2;
@@ -282,13 +307,6 @@ public:
         if (Keyboard::isKeyPressed(Keyboard::Key::N)) {
         switch_tracks();
         }
-    }
-};
-
-class Enemies : public GameObjects {
-public:
-    Enemies() : GameObjects("coding/assets/meteor.png", 300) {
-        spriteobj->setScale({0.15f, 0.15f});
     }
 };
 
@@ -394,12 +412,6 @@ public:
     }
 };
 
-class Bonus : public GameObjects{
-public:
-    Bonus() : GameObjects("coding/assets/bonus.png",300){
-    }
-};
-
 class ScoreDisplay {
 private:
     Font font;
@@ -414,8 +426,8 @@ public:
         score->setFillColor(Color::Black);
     }
 
-    void score_plus(float deltatime){
-        score_value += deltatime * 30;
+    void score_plus(){
+        score_value += 1;
         score->setString(to_string((int)score_value));
     }
 
@@ -431,6 +443,7 @@ public:
         delete score;
     }
 };
+
 
 int main(){
     // Отрисовка окна и иконки
@@ -483,6 +496,7 @@ int main(){
     HealthBar healthbar;
     Bonus bonus;
     ScoreDisplay score;
+    Coin coin;
     
     myzika.play1();
 
@@ -507,8 +521,9 @@ int main(){
         background.background_move(deltatime);
         meteorit.move(deltatime);
         bonus.move(deltatime);
+        coin.move(deltatime);
         myzika.check_press();
-        score.score_plus(deltatime);
+        // score.score_plus();
 
         if (player.getGlobalBounds().findIntersection(meteorit.getGlobalBounds())) {
             player.damage();
@@ -530,6 +545,11 @@ int main(){
                 bonus.respawn();
             };
         }
+
+        if (player.getGlobalBounds().findIntersection(coin.getGlobalBounds())) {
+            score.score_plus();
+            coin.respawn();
+        }
         
         window.clear(Color::Black);
         background.draw(window);
@@ -538,6 +558,7 @@ int main(){
         meteorit.draw(window);
         healthbar.draw(window);
         bonus.draw(window);
+        coin.draw(window);
         score.draw(window);
         window.display();
     }
