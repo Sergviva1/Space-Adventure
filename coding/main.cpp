@@ -1,13 +1,51 @@
 #define SFML_STATIC
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
 #include <random>
+#include <filesystem>
+#include <iostream>
+#include <stdexcept>
+#include <string>
 using namespace std;
 using namespace sf;
+namespace fs = std::filesystem;
+
 random_device rd;
 mt19937 gen(rd());
 uniform_int_distribution<> distrib(197,955);
+
+// Папка с ресурсами рядом с исполняемым файлом
+fs::path g_asset_dir;
+
+// Полный путь к файлу в assets/
+fs::path asset_path(const fs::path &filename) {
+    return g_asset_dir / filename;
+}
+
+// Проверка загрузки ресурса: при ошибке сообщаем путь и прекращаем запуск
+void require_loaded(bool loaded, const fs::path &path) {
+    if (!loaded) {
+        throw runtime_error("Не удалось загрузить ресурс: " + path.u8string());
+    }
+}
+
+// Каталог исполняемого файла, независимо от текущей рабочей папки
+fs::path executable_dir() {
+    wstring executable_path(32768, L'\0');
+    const DWORD path_length = GetModuleFileNameW(
+        nullptr, executable_path.data(), static_cast<DWORD>(executable_path.size()));
+
+    if (path_length == 0 || path_length >= executable_path.size()) {
+        throw runtime_error("Не удалось определить каталог исполняемого файла.");
+    }
+
+    executable_path.resize(path_length);
+    return fs::path(executable_path).parent_path();
+}
 
 class Player{
 private:
@@ -43,7 +81,8 @@ private:
 
 public:
     Player() : sprite(texture) {
-        texture.loadFromFile("coding\\assets\\spritelist.png");
+        fs::path path = asset_path("spritelist.png");
+        require_loaded(texture.loadFromFile(path), path);
         sprite.setTexture(texture);
         sprite.setTextureRect(IntRect({0,0}, {166, 130}));
         sprite.setPosition({150.f, 550.f});
@@ -138,7 +177,8 @@ class GameObjects{
     float speed;
 public:
     GameObjects(string img, float spd) : speed(spd){
-        textureobj.loadFromFile(img);
+        fs::path path = asset_path(img);
+        require_loaded(textureobj.loadFromFile(path), path);
         spriteobj = new Sprite(textureobj);
         respawn();
     }
@@ -173,20 +213,20 @@ public:
 
 class Enemies : public GameObjects {
 public:
-    Enemies() : GameObjects("coding/assets/meteor.png", 300) {
+    Enemies() : GameObjects("meteor.png", 300) {
         spriteobj->setScale({0.15f, 0.15f});
     }
 };
 
 class Bonus : public GameObjects{
 public:
-    Bonus() : GameObjects("coding/assets/bonus.png",300){
+    Bonus() : GameObjects("bonus.png",300){
     }
 };
 
 class Coin : public GameObjects {
 public:
-    Coin() : GameObjects("coding/assets/coin.png",300){
+    Coin() : GameObjects("coin.png",300){
         spriteobj->setScale({0.45f,0.45f});
     }
 };
@@ -200,7 +240,8 @@ class Background {
     Vector2f pos;
     public:
     Background(){
-        texturespace.loadFromFile("coding\\assets\\space.jpg");
+        fs::path path = asset_path("space.jpg");
+        require_loaded(texturespace.loadFromFile(path), path);
         backgroundgame.setTexture(&texturespace);
         backgroundgame2.setTexture(&texturespace);
         backgroundgame.setSize(Vector2f{1920,1080});
@@ -229,7 +270,8 @@ class GamePanel {
     RectangleShape GamePanelshape;
     public:
     GamePanel() {
-        gamepaneltexture.loadFromFile("coding\\assets\\gamepanel.png");
+        fs::path path = asset_path("gamepanel.png");
+        require_loaded(gamepaneltexture.loadFromFile(path), path);
         GamePanelshape.setTexture(&gamepaneltexture);
         GamePanelshape.setSize(Vector2f{1920,720});
         GamePanelshape.setPosition(Vector2f{0,0});
@@ -246,7 +288,8 @@ private:
     Sprite *GameOver_Sprite;
 public:
     GameOver() {
-        GameOver_Texture.loadFromFile("coding\\assets\\gameover.png");
+        fs::path path = asset_path("gameover.png");
+        require_loaded(GameOver_Texture.loadFromFile(path), path);
         GameOver_Sprite = new Sprite (GameOver_Texture);
         GameOver_Sprite->setScale({0.4f,0.4f});
         GameOver_Sprite->setPosition({650,339});
@@ -267,7 +310,8 @@ private:
     Sprite *Sprite_HealthBar;
 public:
     HealthBar() {
-        Texture_HealthBar.loadFromFile("coding\\assets\\healthbar.png");
+        fs::path path = asset_path("healthbar.png");
+        require_loaded(Texture_HealthBar.loadFromFile(path), path);
         Sprite_HealthBar = new Sprite(Texture_HealthBar);
         Sprite_HealthBar->setPosition({0,0});
         Sprite_HealthBar->setScale({0.5f,0.5f});
@@ -301,7 +345,8 @@ private:
     float score_value = 0.0f;
 public:
     ScoreDisplay() {
-        font.openFromFile("C:/Windows/Fonts/Arial.ttf");
+        fs::path path = asset_path("PT_Sans-Regular.ttf");
+        require_loaded(font.openFromFile(path), path);
         score = new Text(font, "0", 100);
         score->setPosition({3,50});
         score->setScale({0.7f,0.7f});
@@ -373,17 +418,24 @@ class Sounds {
     Sound gameoversound;
 public:
     Sounds() : current_track(1), damagesound(damagebuffer), coinsound(coinbuffer), healsound(healbuffer), gameoversound(gameoverbuffer) {
-        music1.openFromFile("coding\\assets\\The-way-life-goes.ogg");
-        music2.openFromFile("coding\\assets\\music.ogg");
-        music3.openFromFile("coding\\assets\\yeat.ogg");
+        fs::path path1 = asset_path("The-way-life-goes.ogg");
+        require_loaded(music1.openFromFile(path1), path1);
+        fs::path path2 = asset_path("music.ogg");
+        require_loaded(music2.openFromFile(path2), path2);
+        fs::path path3 = asset_path("yeat.ogg");
+        require_loaded(music3.openFromFile(path3), path3);
 
-        damagebuffer.loadFromFile("coding\\assets\\damagesound.wav");
+        fs::path damagepath = asset_path("damagesound.wav");
+        require_loaded(damagebuffer.loadFromFile(damagepath), damagepath);
         damagesound.setBuffer(damagebuffer);
-        coinbuffer.loadFromFile("coding\\assets\\coinsound.wav");
+        fs::path coinpath = asset_path("coinsound.wav");
+        require_loaded(coinbuffer.loadFromFile(coinpath), coinpath);
         coinsound.setBuffer(coinbuffer);
-        healbuffer.loadFromFile("coding\\assets\\healsound.wav");
+        fs::path healpath = asset_path("healsound.wav");
+        require_loaded(healbuffer.loadFromFile(healpath), healpath);
         healsound.setBuffer(healbuffer);
-        gameoverbuffer.loadFromFile("coding\\assets\\gameoversound.wav");
+        fs::path gameoverpath = asset_path("gameoversound.wav");
+        require_loaded(gameoverbuffer.loadFromFile(gameoverpath), gameoverpath);
         gameoversound.setBuffer(gameoverbuffer);
 
         damagesound.setVolume(5);
@@ -466,7 +518,8 @@ public:
         background.setFillColor(Color(0, 0, 50, 200)); // Темно-синий полупрозрачный
         
         // Загрузка шрифта
-        font.openFromFile("C:/Windows/Fonts/Arial.ttf");
+        fs::path path = asset_path("PT_Sans-Regular.ttf");
+        require_loaded(font.openFromFile(path), path);
         startText = new Text(font, "0", 100);
         exitText = new Text(font, "0", 100);
         // Текст "START"
@@ -618,7 +671,9 @@ private:
 
 public:
     Game(): window(VideoMode({1920, 1080}), L"Игра", State::Fullscreen), deltatime(0), gameStarted(false), inMenu(true) {
-        Image icon ("coding\\assets\\icon.png");
+        fs::path iconpath = asset_path("icon.png");
+        Image icon;
+        require_loaded(icon.loadFromFile(iconpath), iconpath);
         window.setIcon(icon);
     }
 
@@ -628,7 +683,13 @@ public:
 };
 
 int main(){
-    Game game;
-    game.run();
+    try {
+        g_asset_dir = executable_dir() / "assets";
+        Game game;
+        game.run();
+    } catch (const exception &e) {
+        cerr << e.what() << endl;
+        return 1;
+    }
     return 0;
 }
