@@ -76,10 +76,10 @@ int main() {
 
         game.player.sprite.setPosition({3000, 3000});
         game.player.player_lock();
-        check(game.player.sprite.getPosition() == Vector2f(1780, 955), "bottom right clamp");
+        check(game.player.sprite.getPosition() == Vector2f(1750, 880), "bottom right clamp");
         game.player.sprite.setPosition({-3000, -3000});
         game.player.player_lock();
-        check(game.player.sprite.getPosition() == Vector2f(-25, 197), "top left clamp");
+        check(game.player.sprite.getPosition() == Vector2f(5, 150), "top left clamp");
         game.player.respawn();
 
         auto overlap = [&](GameObjects& object) {

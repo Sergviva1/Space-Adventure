@@ -22,8 +22,8 @@ private:
     void player_lock()
     {
         const Vector2f position = sprite.getPosition();
-        sprite.setPosition({clamp(position.x, -25.f, 1780.f),
-                            clamp(position.y, 197.f, 955.f)});
+        sprite.setPosition({clamp(position.x, 5.f, 1750.f),
+                            clamp(position.y, 150.f, 880.f)});
     }
 
 public:

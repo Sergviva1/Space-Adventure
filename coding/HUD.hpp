@@ -121,7 +121,7 @@ public:
         fs::path path = asset_path("healthbar.png");
         require_loaded(Texture_HealthBar.loadFromFile(path), path);
         Sprite_HealthBar = make_unique<Sprite>(Texture_HealthBar);
-        Sprite_HealthBar->setPosition({28, 20});
+        Sprite_HealthBar->setPosition({200, 15});
         Sprite_HealthBar->setScale({0.65f, 0.65f});
         emptyBar = make_unique<Sprite>(Texture_HealthBar);
         emptyBar->setTextureRect(IntRect({0, 207}, {312, 104}));
@@ -159,7 +159,7 @@ public:
         fs::path path = asset_path("PT_Sans-Regular.ttf");
         require_loaded(font.openFromFile(path), path);
         score = make_unique<Text>(font, "0", 100);
-        score->setPosition({30, 90});
+        score->setPosition({420, 15});
         score->setScale({0.55f, 0.55f});
         score->setFillColor(Color::White);
         score->setOutlineColor(Color(5, 5, 30));
