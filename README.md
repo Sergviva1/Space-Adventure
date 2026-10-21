@@ -4,6 +4,14 @@
 
 Проект [Sergviva1](https://github.com/Sergviva1). Версия **0.1.0**. Описание изменений — в [CHANGELOG.md](CHANGELOG.md).
 
+## Скачать
+
+**[Скачать Space Adventure 0.1.0 для Windows x64](https://github.com/Sergviva1/sfmlgame/releases/download/v0.1.0/SpaceAdventure-0.1.0-win64.zip)**
+
+Полностью распакуйте архив и запустите `main.exe`. Устанавливать компилятор или SFML не нужно; сохраняйте `assets/` и DLL рядом с EXE.
+
+[Страница релиза](https://github.com/Sergviva1/sfmlgame/releases/tag/v0.1.0) содержит контрольные суммы и отдельный ZIP исходников runtime GCC/MinGW. Для запуска игры этот ZIP не требуется.
+
 ![Игровой процесс](docs/screenshots/gameplay.png)
 
 <details>
