@@ -16,6 +16,9 @@ $files = @(
     'sfml-audio-3.dll', 'sfml-graphics-3.dll', 'sfml-system-3.dll', 'sfml-window-3.dll',
     'README.md', 'SPEC.md', 'CREDITS.md', 'LICENSE',
     'licenses/README.md', 'licenses/runtime-sha256.txt', 'licenses/CC0-1.0.txt',
+    'licenses/SFML-verification.md', 'licenses/runtime-sources.md',
+    'licenses/runtime-sources-sha256.txt', 'licenses/gcc-libs.BUILDINFO.txt',
+    'licenses/libwinpthread.BUILDINFO.txt',
     'licenses/SFML.md', 'licenses/FreeType.txt', 'licenses/Ogg.txt',
     'licenses/Vorbis.txt', 'licenses/FLAC.txt', 'licenses/miniaudio.txt',
     'licenses/minimp3-CC0.txt', 'licenses/stb_image.txt', 'licenses/stb_image_write.txt',
@@ -81,9 +84,11 @@ try {
 Собственные графика и эффекты — CC0 в пределах прав автора (assets/LICENSE.md).
 Шрифт — SIL OFL. Разрешение распространять музыку Zvukogram вместе с игрой
 подтверждено автором проекта; музыка не перелицензирована под CC0/MIT (CREDITS.md).
-SFML DLL совпали с предоставленной автором папкой SFML-3.0.2; runtime обновлён
-из текущего MSYS2 UCRT64. До публикации остаются подтверждение источника копии
-SFML, проверка обязательств по исходникам runtime и ручная игровая проверка.
+SFML DLL совпали с локальным архивом, скачивание которого с официального сайта
+подтвердил автор; runtime обновлён из MSYS2 UCRT64. Исходники runtime подготовлены
+для отдельного ZIP: его нужно публиковать рядом с игрой с равнозначным доступом
+(licenses/runtime-sources.md). До релиза остаются старые ресурсы в истории Git,
+ручная игровая проверка и публикация обоих архивов.
 Уведомления библиотек и версии пакетов приведены в licenses/.
 Этот архив не является подтверждением разрешения на распространение.
 
@@ -100,7 +105,7 @@ SHA256SUMS.txt содержит контрольные суммы файлов (
     Move-Item -LiteralPath $tempZip -Destination $archive -Force
     $archiveHash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
     "$archiveHash  $name.zip" | Set-Content -LiteralPath "$archive.sha256" -Encoding ASCII
-    Write-Warning 'Local archive only: SFML copy provenance, runtime source obligations and manual gameplay checks remain before publication.'
+    Write-Warning 'Local archive only: publish the runtime source ZIP alongside the game; review old assets in Git history and complete manual gameplay checks before release.'
     Write-Output "Created: $archive"
     Write-Output "SHA256: $archiveHash"
 } finally {
