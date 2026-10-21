@@ -16,7 +16,7 @@ $files = @(
     'sfml-audio-3.dll', 'sfml-graphics-3.dll', 'sfml-system-3.dll', 'sfml-window-3.dll',
     'README.md', 'SPEC.md', 'CREDITS.md', 'LICENSE',
     'licenses/README.md', 'licenses/runtime-sha256.txt', 'licenses/CC0-1.0.txt',
-    'licenses/SFML-verification.md', 'licenses/runtime-sources.md',
+    'licenses/runtime-sources.md',
     'licenses/runtime-sources-sha256.txt', 'licenses/gcc-libs.BUILDINFO.txt',
     'licenses/libwinpthread.BUILDINFO.txt',
     'licenses/SFML.md', 'licenses/FreeType.txt', 'licenses/Ogg.txt',
@@ -80,17 +80,13 @@ try {
 После поражения: R/Enter — новая игра; M — меню; Esc — выход.
 Рекорд хранится в %LOCALAPPDATA%\SpaceAdventure\highscore.txt, отдельно от игры.
 
-Авторский код распространяется по MIT (см. LICENSE).
-Собственные графика и эффекты — CC0 в пределах прав автора (assets/LICENSE.md).
-Шрифт — SIL OFL. Разрешение распространять музыку Zvukogram вместе с игрой
-подтверждено автором проекта; музыка не перелицензирована под CC0/MIT (CREDITS.md).
-SFML DLL совпали с локальным архивом, скачивание которого с официального сайта
-подтвердил автор; runtime обновлён из MSYS2 UCRT64. Исходники runtime подготовлены
-для отдельного ZIP: его нужно публиковать рядом с игрой с равнозначным доступом
-(licenses/runtime-sources.md). До релиза остаются старые ресурсы в истории Git,
-ручная игровая проверка и публикация обоих архивов.
-Уведомления библиотек и версии пакетов приведены в licenses/.
-Этот архив не является подтверждением разрешения на распространение.
+Код — MIT (LICENSE), графика и эффекты — CC0 в пределах применимых прав
+(assets/LICENSE.md), шрифт — SIL OFL. Музыка Zvukogram имеет отдельные условия
+и не предоставляется под MIT или CC0; источники и ограничения — в CREDITS.md.
+Уведомления библиотек и версии пакетов находятся в licenses/.
+При публичной раздаче игры разместите рядом ZIP исходников runtime GCC/MinGW
+с равнозначным доступом. Инструкция — licenses/runtime-sources.md.
+Локальная сборка не заменяет проверку на отдельном Windows-компьютере.
 
 SHA256SUMS.txt содержит контрольные суммы файлов (кроме самого списка).
 '@ | Set-Content -LiteralPath (Join-Path $package 'START-HERE.txt') -Encoding UTF8
@@ -105,7 +101,7 @@ SHA256SUMS.txt содержит контрольные суммы файлов (
     Move-Item -LiteralPath $tempZip -Destination $archive -Force
     $archiveHash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
     "$archiveHash  $name.zip" | Set-Content -LiteralPath "$archive.sha256" -Encoding ASCII
-    Write-Warning 'Local archive only: publish the runtime source ZIP alongside the game; review old assets in Git history and complete manual gameplay checks before release.'
+    Write-Warning 'Local build: test on a separate Windows PC before release and publish the runtime source ZIP alongside the game.'
     Write-Output "Created: $archive"
     Write-Output "SHA256: $archiveHash"
 } finally {
