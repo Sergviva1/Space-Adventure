@@ -8,13 +8,22 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $dist = Join-Path $root 'dist'
 $name = "SpaceAdventure-$Version-win64"
+$projectVersion = (Get-Content -LiteralPath (Join-Path $root 'VERSION') -Raw).Trim()
+if ($Version -ne 'local' -and $Version -ne $projectVersion) {
+    throw "Release version must match VERSION ($projectVersion): $Version"
+}
+$heading = if ($Version -eq 'local') {
+    'ЛОКАЛЬНАЯ ПРОВЕРОЧНАЯ СБОРКА'
+} else {
+    "SPACE ADVENTURE $Version - WINDOWS X64"
+}
 
 # Проверены все обязательные файлы до создания архива.
 $files = @(
     'main.exe',
     'libgcc_s_seh-1.dll', 'libstdc++-6.dll', 'libwinpthread-1.dll',
     'sfml-audio-3.dll', 'sfml-graphics-3.dll', 'sfml-system-3.dll', 'sfml-window-3.dll',
-    'README.md', 'SPEC.md', 'CREDITS.md', 'LICENSE',
+    'README.md', 'CREDITS.md', 'LICENSE', 'VERSION', 'CHANGELOG.md',
     'licenses/README.md', 'licenses/runtime-sha256.txt', 'licenses/CC0-1.0.txt',
     'licenses/runtime-sources.md',
     'licenses/runtime-sources-sha256.txt', 'licenses/gcc-libs.BUILDINFO.txt',
@@ -69,10 +78,8 @@ try {
         Copy-Item -LiteralPath (Join-Path $root $file) -Destination $destination
     }
 
-    # Архив предназначен для локальной проверки, а не для публикации.
-    @'
-ЛОКАЛЬНАЯ ПРОВЕРОЧНАЯ СБОРКА — НЕ ПУБЛИЧНЫЙ РЕЛИЗ
-
+    # Заголовок различал локальную и версионную сборки.
+    $instructions = @'
 Распакуйте весь архив и запустите main.exe. Устанавливать SFML или компилятор не нужно.
 Не перемещайте main.exe отдельно от DLL и assets/. Рабочая папка может быть любой.
 Управление: Enter — старт; WASD — движение; N — музыка; Esc/P — пауза.
@@ -86,10 +93,11 @@ try {
 Уведомления библиотек и версии пакетов находятся в licenses/.
 При публичной раздаче игры разместите рядом ZIP исходников runtime GCC/MinGW
 с равнозначным доступом. Инструкция — licenses/runtime-sources.md.
-Локальная сборка не заменяет проверку на отдельном Windows-компьютере.
 
 SHA256SUMS.txt содержит контрольные суммы файлов (кроме самого списка).
-'@ | Set-Content -LiteralPath (Join-Path $package 'START-HERE.txt') -Encoding UTF8
+'@
+    ($heading + "`r`n`r`n" + $instructions) |
+        Set-Content -LiteralPath (Join-Path $package 'START-HERE.txt') -Encoding UTF8
 
     $hashes = Get-ChildItem -LiteralPath $package -Recurse -File | Sort-Object FullName | ForEach-Object {
         $relative = $_.FullName.Substring($package.Length + 1).Replace('\', '/')
@@ -101,7 +109,8 @@ SHA256SUMS.txt содержит контрольные суммы файлов (
     Move-Item -LiteralPath $tempZip -Destination $archive -Force
     $archiveHash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
     "$archiveHash  $name.zip" | Set-Content -LiteralPath "$archive.sha256" -Encoding ASCII
-    Write-Warning 'Local build: test on a separate Windows PC before release and publish the runtime source ZIP alongside the game.'
+    if ($Version -eq 'local') { Write-Warning 'Local build; use mingw32-make release to prepare the versioned release.' }
+    Write-Warning 'Publish the runtime source ZIP alongside the game with equally accessible download links.'
     Write-Output "Created: $archive"
     Write-Output "SHA256: $archiveHash"
 } finally {
