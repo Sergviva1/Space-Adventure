@@ -6,18 +6,19 @@ CXXFLAGS = -std=c++17 -Wall -Wextra -Wpedantic
 PROJECT_DIR = $(CURDIR)
 LIBS = -L"$(PROJECT_DIR)/src/lib" -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 EXECUTABLE = main.exe
+COMMON_SOURCES = "$(PROJECT_DIR)/coding/Resources.cpp"
 
 # Компилятор запускался из временной папки пользователя, чтобы DLL игры в корне не конфликтовали с DLL GCC.
 all:
-	set "TMP=%LOCALAPPDATA%\Temp" && set "TEMP=%LOCALAPPDATA%\Temp" && set "TMPDIR=%LOCALAPPDATA%\Temp" && cd /d "%LOCALAPPDATA%\Temp" && $(CXX) -I"$(PROJECT_DIR)/src/include" $(CXXFLAGS) -o "$(PROJECT_DIR)/$(EXECUTABLE)" "$(PROJECT_DIR)/coding/main.cpp" $(LIBS)
+	set "TMP=%LOCALAPPDATA%\Temp" && set "TEMP=%LOCALAPPDATA%\Temp" && set "TMPDIR=%LOCALAPPDATA%\Temp" && cd /d "%LOCALAPPDATA%\Temp" && $(CXX) -I"$(PROJECT_DIR)/src/include" $(CXXFLAGS) -o "$(PROJECT_DIR)/$(EXECUTABLE)" "$(PROJECT_DIR)/coding/main.cpp" $(COMMON_SOURCES) $(LIBS)
 
 # Тест включал main.cpp с доступом к внутренним полям только в тестовой сборке.
 smoke:
-	set "TMP=%LOCALAPPDATA%\Temp" && set "TEMP=%LOCALAPPDATA%\Temp" && set "TMPDIR=%LOCALAPPDATA%\Temp" && cd /d "%LOCALAPPDATA%\Temp" && $(CXX) -I"$(PROJECT_DIR)/src/include" $(CXXFLAGS) -fno-access-control -o "$(PROJECT_DIR)/smoke.exe" "$(PROJECT_DIR)/tests/smoke.cpp" $(LIBS)
+	set "TMP=%LOCALAPPDATA%\Temp" && set "TEMP=%LOCALAPPDATA%\Temp" && set "TMPDIR=%LOCALAPPDATA%\Temp" && cd /d "%LOCALAPPDATA%\Temp" && $(CXX) -I"$(PROJECT_DIR)/src/include" $(CXXFLAGS) -fno-access-control -o "$(PROJECT_DIR)/smoke.exe" "$(PROJECT_DIR)/tests/smoke.cpp" $(COMMON_SOURCES) $(LIBS)
 	"$(PROJECT_DIR)/smoke.exe"
 
 screenshots:
-	set "TMP=%LOCALAPPDATA%\Temp" && set "TEMP=%LOCALAPPDATA%\Temp" && set "TMPDIR=%LOCALAPPDATA%\Temp" && cd /d "%LOCALAPPDATA%\Temp" && $(CXX) -I"$(PROJECT_DIR)/src/include" $(CXXFLAGS) -fno-access-control -o "$(PROJECT_DIR)/capture.exe" "$(PROJECT_DIR)/tests/capture.cpp" $(LIBS)
+	set "TMP=%LOCALAPPDATA%\Temp" && set "TEMP=%LOCALAPPDATA%\Temp" && set "TMPDIR=%LOCALAPPDATA%\Temp" && cd /d "%LOCALAPPDATA%\Temp" && $(CXX) -I"$(PROJECT_DIR)/src/include" $(CXXFLAGS) -fno-access-control -o "$(PROJECT_DIR)/capture.exe" "$(PROJECT_DIR)/tests/capture.cpp" $(COMMON_SOURCES) $(LIBS)
 	"$(PROJECT_DIR)/capture.exe"
 
 # Подготовлен локальный архив; оставшиеся проверки перед публикацией перечислены в SPEC.md.
